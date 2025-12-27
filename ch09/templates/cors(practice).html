@@ -12,4 +12,25 @@
 
 
 <!-- practice start -->
+ {% block js %}
+<script>
+	document.getElementById('fetch_origin_allow_cors').addEventListener(
+		'click',function(){
+            console.log('fetch_origin_allow_cors');
+            fetch('{{ api_url_origin_allow_cors }}')
+				.then(r=>r.text())
+				.then(t=>document.getElementById('result').textContent=t)
+				.catch(e=>document.getElementById('result').textContent='Error:' + e);
+		}
+	);
+	document.getElementById('fetch_origin_not_allow_cors').addEventListener(
+		'click',function(){
+            fetch('{{ api_url_origin_not_allow_cors }}')
+				.then(r=>r.text())
+				.then(t=>document.getElementById('result').textContent=t)
+				.catch(e=>document.getElementById('result').textContent='Error:' + e);
+		}
+	);
+</script>
+{% endblock js %}
 <!-- practice end -->

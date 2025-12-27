@@ -10,6 +10,16 @@ def index():
 
 
 # practice start
+@app.route('/form')
+def get_form():
+    return render_template('form(practice).html', page_header="Form")
+
+@app.route('/form_result', methods=['POST']) # default methods is "GET"
+def form_result():
+    data = [["method:", request.method],
+            ["base_url:", request.base_url],
+            ["form data:", request.form]]
+    return render_template('form_result(practice).html', page_header="Form data", data=data)
 # practice end
 
 
