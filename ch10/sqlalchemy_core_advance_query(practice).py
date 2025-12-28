@@ -17,6 +17,54 @@ table_invoices = db.Table('invoices', metadata, autoload_with=engine)
 
 
 #----------practice start------------
+# and/or
+query = db.select(table_invoices.c.InvoiceId, table_invoices.c.BillingCountry, table_invoices.c.Total).select_from(table_invoices).where(db.and_(table_invoices.c.BillingCountry=="Argentina", table_invoices.c.Total>=2))
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The cost over 2 dollars in Argentina: {results}",end="\n"+("-"*80)+"\n")
+query = db.select(table_invoices.c.InvoiceId, table_invoices.c.BillingCountry, table_invoices.c.Total).select_from(table_invoices).where(db.and_(db.or_(table_invoices.c.BillingCountry=="Argentina", table_invoices.c.BillingCountry=="Poland"), table_invoices.c.Total>=2))
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The cost over 2 dollars in Argentina or Poland: {results}",end="\n"+("-"*80)+"\n")
+
+# SQL function
+query = db.select(func.count()).select_from(table_invoices)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"Number of invoices: {results}",end="\n"+("-"*80)+"\n")
+query = db.select(func.max(table_invoices.c.Total)).select_from(table_invoices)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The most expensive invoices: {results}",end="\n"+("-"*80)+"\n")
+query = db.select(func.avg(table_invoices.c.Total)).select_from(table_invoices)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The average cost of invoices: {results}",end="\n"+("-"*80)+"\n")
+
+# group by
+query = db.select(table_invoices.c.BillingCountry, func.sum(table_invoices.c.Total)).select_from(table_invoices).group_by(table_invoices.c.BillingCountry)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The sum cost of each country: {results}",end="\n"+("-"*80)+"\n")
+query = db.select(table_invoices.c.BillingCountry, func.sum(table_invoices.c.Total)).select_from(table_invoices).where(table_invoices.c.Total > 3).group_by(table_invoices.c.BillingCountry)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The sum cost where the cost is larger than 3 dollars of each country: {results}",end="\n"+("-"*80)+"\n")
+query = db.select(table_invoices.c.BillingCountry, func.sum(table_invoices.c.Total)).select_from(table_invoices).where(table_invoices.c.Total > 3).group_by(table_invoices.c.BillingCountry).having(func.sum(table_invoices.c.Total)>100)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The sum cost where the cost is larger than 3 dollars, and sum cost larger than 100 dollars: {results}",end="\n"+("-"*80)+"\n")
+query = db.select(table_invoices.c.BillingCountry, func.sum(table_invoices.c.Total)).select_from(table_invoices).group_by(table_invoices.c.BillingCountry).having(func.sum(table_invoices.c.Total)>100)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+print(f"The sum cost where the cost larger than 100 dollars: {results}",end="\n"+("-"*80)+"\n")
+
+# join
+j_invoice_customer = table_invoices.join(table_customers, table_invoices.c.CustomerId==table_customers.c.CustomerId)
+query = db.select(table_invoices.c.InvoiceDate, table_customers.c.FirstName).select_from(j_invoice_customer).where(table_customers.c.CustomerId==2)
+proxy = connection.execute(query)
+results = proxy.fetchall()
+
 #----------practice end------------
 
 # Close connection & engine
